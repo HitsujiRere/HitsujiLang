@@ -45,5 +45,7 @@ assert 0 "5<5;"
 assert 8 "4;8;"
 assert 8 "a=5+3;"
 assert 10 "a=5+3;a+2;"
+assert 23 "a=5+3;b=a*2;a+b-1;"
+assert 11 "var1=7;var2=4;var3=var1+var2;var3;"
 
 echo OK

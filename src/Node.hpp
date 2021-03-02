@@ -3,8 +3,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "Token.hpp"
+#include "LVar.hpp"
 
 // トークンの種類
 enum class NodeKind {

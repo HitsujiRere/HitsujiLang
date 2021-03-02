@@ -1,8 +1,27 @@
 #include "Node.hpp"
 #include "Error.hpp"
 
+// ローカル変数
+std::map<std::string, LVar> lvars;
+
+// オフセット合計
+int next_offset = 0;
+
 bool isReserved(const std::vector<Token>::const_iterator& token_itr, const std::string& txt) {
     return token_itr->kind == TokenKind::RESERVED && token_itr->txt == txt;
+}
+
+int get_offset(const std::vector<Token>::const_iterator& token_itr, const std::string& name) {
+    auto lvar_itr = lvars.find(name);
+
+    if (lvar_itr == lvars.end()) {
+        LVar lvar(name, next_offset);
+        next_offset += 8;
+        lvars.emplace(name, lvar);
+        return lvar.offset;
+    }
+
+    return lvar_itr->second.offset;
 }
 
 Node *program(std::vector<Token>::const_iterator& token_itr) {
@@ -171,7 +190,7 @@ Node *primary(std::vector<Token>::const_iterator& token_itr) {
         return node;
     } else if (token_itr->kind == TokenKind::IDENT) {
         Node *node = new Node(NodeKind::LVAR);
-        node->offset = (token_itr->txt.at(0) - 'a' + 1) * 8;
+        node->offset = get_offset(token_itr, token_itr->txt);
         token_itr++;
         return node;
     } else {
