@@ -3,8 +3,6 @@
 
 int main(int argc, char const *argv[])
 {
-    std::string code;
-
     Error::code_ptr = &code;
 
     if (argc == 1) {
@@ -21,11 +19,16 @@ int main(int argc, char const *argv[])
     code = std::string(argv[1]);
 
     tokens = tokenize(code);
-    
+
+    auto tokens_head = tokens.cbegin();
+    node = program(tokens_head);
+
     std::cout << ".intel_syntax noprefix" << std::endl;
     std::cout << ".globl main" << std::endl;
     std::cout << "main:" << std::endl;
-    std::cout << "  mov rax, " << code << std::endl;
+
+    generate(std::cout, node);
+    
     std::cout << "  ret" << std::endl;
 
     return 0;

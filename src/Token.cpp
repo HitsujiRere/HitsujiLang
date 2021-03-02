@@ -21,7 +21,8 @@ size_t search_reserves(const std::string& txt, size_t i) {
         }
     }
     for (const auto& reserve : reserves_ident) {
-        if (reserve == txt.substr(i, reserve.size()) && !is_ident_char(txt.at(i + reserve.size() + 1))) {
+        if (reserve == txt.substr(i, reserve.size()) && 
+            !is_ident_char(txt.at(i + reserve.size() + 1))) {
             return reserve.size();
         }
     }
@@ -30,13 +31,13 @@ size_t search_reserves(const std::string& txt, size_t i) {
 
 size_t get_number_len(const std::string& txt, size_t i) {
     size_t len = 0;
-    for (; '0' <= txt.at(i + len) && txt.at(i + len) <= '9'; len++) { }
+    for (; i + len < txt.size() && '0' <= txt.at(i + len) && txt.at(i + len) <= '9'; len++) { }
     return len;
 }
 
 int parseToInt(const std::string& txt, size_t i) {
     int num = 0;
-    for (size_t j = 0; '0' <= txt.at(i + j) && txt.at(i + j) <= '9'; j++) {
+    for (; i < txt.size() && '0' <= txt.at(i) && txt.at(i) <= '9'; i++) {
         num = num * 10 + (txt.at(i) - '0');
     }
     return num;
@@ -76,8 +77,8 @@ std::vector<Token> tokenize(const std::string& code) {
         if ('0' <= code.at(i) && code.at(i) <= '9') {
             size_t len = get_number_len(code, i);
             Token token;
-            token.kind = TokenKind::NUM;
-            token.txt = code.substr(i, len);
+            token.kind = TokenKind::NUMBER;
+            token.value = parseToInt(code, i);
             token.pos = i;
             tokens.push_back(token);
             i += len - 1;
@@ -86,6 +87,10 @@ std::vector<Token> tokenize(const std::string& code) {
 
         Error::at(i, "トークナイズできません");
     }
+
+    // for (const auto& token : tokens) {
+    //     std::cerr << (int)token.kind << " " << token.txt << " " << token.value << std::endl;
+    // }
 
     return tokens;
 }
