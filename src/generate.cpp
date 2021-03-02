@@ -42,6 +42,13 @@ std::ostream &generate(std::ostream &out, Node* node) {
         out << "  mov [rax], rdi\n";
         out << "  push rdi\n";
         break;
+    case NodeKind::RETURN:
+        generate(out, node->args.at(0));
+        out << "  pop rax\n";
+        out << "  mov rsp, rbp\n";
+        out << "  pop rbp\n";
+        out << "  ret\n";
+        break;
     case NodeKind::ADD:
         generate(out, node->args.at(0));
         generate(out, node->args.at(1));

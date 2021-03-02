@@ -21,6 +21,7 @@ enum class NodeKind {
     LT,     // <
     LEQ,    // <=
     ASSIGN, // =
+    RETURN, // return
     NUMBER, // 整数
     LVAR,   // ローカル変数
     BLOCK,  // ブロック
@@ -38,6 +39,7 @@ struct Node {
 
 // program    = stmt*
 // stmt       = expr ";"
+//            | "return" expr ";"
 // expr       = assign
 // assign     = comp ("=" assign)?
 // comp       = add ("==" add | "!=" add | "<" add | "<=" add | ">" add | ">=" add)*

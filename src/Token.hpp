@@ -35,8 +35,8 @@ const std::vector<std::string> reserves = {
 // 識別子のような記号
 const std::vector<std::string> reserves_ident = {
     // "def",
-    // "return",
-    // "if",
+    "return",
+    "if",
     // "else",
     // "while",
     // "for",
