@@ -10,12 +10,6 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
-    // code = getCode(argv[1]);
-
-    // for (size_t i = 0; i < code.size(); i++) {
-    //     std::cout << i << " | " << code.at(i) << std::endl;
-    // }
-
     code = std::string(argv[1]);
 
     tokens = tokenize(code);
@@ -23,18 +17,18 @@ int main(int argc, char const *argv[])
     auto tokens_head = tokens.cbegin();
     node = program(tokens_head);
 
-    std::cout << ".intel_syntax noprefix" << std::endl;
-    std::cout << ".globl main" << std::endl;
-    std::cout << "main:" << std::endl;
-    std::cout << "  push rbp" << std::endl;
-    std::cout << "  mov rbp, rsp" << std::endl;
-    std::cout << "  sub rsp, 208" << std::endl;
+    std::cout << ".intel_syntax noprefix\n";
+    std::cout << ".globl main\n";
+    std::cout << "main:\n";
+    std::cout << "  push rbp\n";
+    std::cout << "  mov rbp, rsp\n";
+    std::cout << "  sub rsp, 208\n";
 
     generate(std::cout, node);
     
-    std::cout << "  mov rsp, rbp" << std::endl;
-    std::cout << "  pop rbp" << std::endl;
-    std::cout << "  ret" << std::endl;
+    std::cout << "  mov rsp, rbp\n";
+    std::cout << "  pop rbp\n";
+    std::cout << "  ret\n";
 
     return 0;
 }

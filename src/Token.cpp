@@ -98,9 +98,5 @@ std::vector<Token> tokenize(const std::string& code) {
     end_token.pos = code.size();
     tokens.push_back(end_token);
 
-    // for (const auto& token : tokens) {
-    //     std::cerr << (int)token.kind << " " << token.txt << " " << token.value << std::endl;
-    // }
-
     return tokens;
 }

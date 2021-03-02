@@ -4,10 +4,11 @@ std::string *Error::code_ptr = nullptr;
 
 void Error::at(size_t char_number, const std::string& message) {
     if (code_ptr != nullptr && 0 <= char_number) {
-        std::cerr << *code_ptr << std::endl;
-        std::cerr << std::string(char_number, ' ') << "^ " << std::endl;
+        std::cerr << *code_ptr << "\n";
+        std::cerr << std::string(char_number, ' ') << "^ \n";
     }
-    std::cerr << message << std::endl;
+    std::cerr << message << "\n";
+    std::cerr << std::flush;
     exit(1);
 }
 
