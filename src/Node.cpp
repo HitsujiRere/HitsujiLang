@@ -5,27 +5,41 @@ bool isReserved(const std::vector<Token>::const_iterator& token_itr, const std::
     return token_itr->kind == TokenKind::RESERVED && token_itr->txt == txt;
 }
 
-// expr     = equality
-// comp     = add ("==" add | "!=" add | "<" add | "<=" add | ">" add | ">=" add)*
-// add      = mul ("+" mul | "-" mul)*
-// mul      = unary ("*" unary | "/" unary)*
-// unary    = ("+" | "-")? primary
-// primary  = num | "(" expr ")"
-Node *expr(std::vector<Token>::const_iterator& token_itr);
-Node *comp(std::vector<Token>::const_iterator& token_itr);
-Node *add(std::vector<Token>::const_iterator& token_itr);
-Node *mul(std::vector<Token>::const_iterator& token_itr);
-Node *unary(std::vector<Token>::const_iterator& token_itr);
-Node *primary(std::vector<Token>::const_iterator& token_itr);
-
 Node *program(std::vector<Token>::const_iterator& token_itr) {
     Node *node = new Node(NodeKind::BLOCK);
-    node->args.push_back(expr(token_itr));
+    while (token_itr->kind != TokenKind::END) {
+        node->args.push_back(stmt(token_itr));
+    }
+    return node;
+}
+
+Node *stmt(std::vector<Token>::const_iterator& token_itr) {
+    Node *node = expr(token_itr);
+
+    if (!isReserved(token_itr, ";")) {
+        Error::at(token_itr->pos, "';'ではありません");
+    }
+    token_itr++;
+
     return node;
 }
 
 Node *expr(std::vector<Token>::const_iterator& token_itr) {
-    return comp(token_itr);
+    return assign(token_itr);
+}
+
+Node *assign(std::vector<Token>::const_iterator& token_itr) {
+    Node *node = comp(token_itr);
+
+    if (isReserved(token_itr, "=")) {
+        token_itr++;
+        Node *ass = new Node(NodeKind::ASSIGN);
+        ass->args.push_back(node);
+        ass->args.push_back(assign(token_itr));
+        return ass;
+    }
+
+    return node;
 }
 
 Node *comp(std::vector<Token>::const_iterator& token_itr) {
@@ -155,8 +169,13 @@ Node *primary(std::vector<Token>::const_iterator& token_itr) {
         node->value = token_itr->value;
         token_itr++;
         return node;
+    } else if (token_itr->kind == TokenKind::IDENT) {
+        Node *node = new Node(NodeKind::LVAR);
+        node->offset = (token_itr->txt.at(0) - 'a' + 1) * 8;
+        token_itr++;
+        return node;
     } else {
-        Error::at(token_itr->pos, "'('または数字ではありません");
+        Error::at(token_itr->pos, "'('または数字，識別子ではありません");
         return nullptr;
     }
 }

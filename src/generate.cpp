@@ -1,12 +1,30 @@
 #include "generate.hpp"
 #include "Error.hpp"
 
+std::ostream &generate_lvalue(std::ostream &out, Node* node) {
+    if (node->kind != NodeKind::LVAR) {
+        Error::at(-1, "代入の左辺値が変数ではありません");
+    }
+
+    out << "  mov rax, rbp" << std::endl;
+    out << "  sub rax, " << node->offset << std::endl;
+    out << "  push rax" << std::endl;
+    
+    return out;
+}
+
 std::ostream &generate(std::ostream &out, Node* node) {
     switch(node->kind) {
     case NodeKind::NOP:
         break;
     case NodeKind::NUMBER:
         out << "  push " << node->value << std::endl;
+        break;
+    case NodeKind::LVAR:
+        generate_lvalue(out, node);
+        out << "  pop rax" << std::endl;
+        out << "  mov rax, [rax]" << std::endl;
+        out << "  push rax" << std::endl;
         break;
     case NodeKind::BLOCK:
         for (auto arg : node->args) {
@@ -15,6 +33,14 @@ std::ostream &generate(std::ostream &out, Node* node) {
                 out << "  pop rax" << std::endl;
             }
         }
+        break;
+    case NodeKind::ASSIGN:
+        generate_lvalue(out, node->args.at(0));
+        generate(out, node->args.at(1));
+        out << "  pop rdi" << std::endl;
+        out << "  pop rax" << std::endl;
+        out << "  mov [rax], rdi" << std::endl;
+        out << "  push rdi" << std::endl;
         break;
     case NodeKind::ADD:
         generate(out, node->args.at(0));

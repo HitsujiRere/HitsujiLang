@@ -14,6 +14,12 @@ bool is_ident_head_char(char ch) {
         || (ch == '_');
 }
 
+size_t get_ident_len(const std::string& txt, size_t i) {
+    size_t len = 0;
+    for (; i + len < txt.size() && is_ident_char(txt.at(i + len)); len++) { }
+    return len;
+}
+
 size_t search_reserves(const std::string& txt, size_t i) {
     for (const auto& reserve : reserves) {
         if (reserve == txt.substr(i, reserve.size())) {
@@ -65,13 +71,15 @@ std::vector<Token> tokenize(const std::string& code) {
             continue;
         }
 
-        // if (is_ident_head_char(*code_itr)) {
-        //     size_t len = search_ident(code_itr);
-        //     cur = Token::makeNext(TokenKind::IDENT, cur, code_itr - code.begin());
-        //     cur->str = substr(code_itr, len);
-        //     code_itr += len;
-        //     continue;
-        // }
+        if (is_ident_head_char(code.at(i))) {
+            size_t len = get_ident_len(code, i);
+            Token token(TokenKind::IDENT);
+            token.txt = code.substr(i, len);
+            token.pos = i;
+            tokens.push_back(token);
+            i += len - 1;
+            continue;
+        }
 
         if ('0' <= code.at(i) && code.at(i) <= '9') {
             size_t len = get_number_len(code, i);
@@ -86,7 +94,9 @@ std::vector<Token> tokenize(const std::string& code) {
         Error::at(i, "トークナイズできません");
     }
 
-    tokens.push_back(Token(TokenKind::END));
+    Token end_token(TokenKind::END);
+    end_token.pos = code.size();
+    tokens.push_back(end_token);
 
     // for (const auto& token : tokens) {
     //     std::cerr << (int)token.kind << " " << token.txt << " " << token.value << std::endl;

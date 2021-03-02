@@ -26,9 +26,14 @@ int main(int argc, char const *argv[])
     std::cout << ".intel_syntax noprefix" << std::endl;
     std::cout << ".globl main" << std::endl;
     std::cout << "main:" << std::endl;
+    std::cout << "  push rbp" << std::endl;
+    std::cout << "  mov rbp, rsp" << std::endl;
+    std::cout << "  sub rsp, 208" << std::endl;
 
     generate(std::cout, node);
     
+    std::cout << "  mov rsp, rbp" << std::endl;
+    std::cout << "  pop rbp" << std::endl;
     std::cout << "  ret" << std::endl;
 
     return 0;
