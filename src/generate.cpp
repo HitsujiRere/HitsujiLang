@@ -58,6 +58,46 @@ std::ostream &generate(std::ostream &out, Node* node) {
         out << "  idiv rdi" << std::endl;
         out << "  push rdx" << std::endl;
         break;
+    case NodeKind::EQ:
+        generate(out, node->args.at(0));
+        generate(out, node->args.at(1));
+        out << "  pop rdi" << std::endl;
+        out << "  pop rax" << std::endl;
+        out << "  cmp rax, rdi" << std::endl;
+        out << "  sete al" << std::endl;
+        out << "  movzb rax, al" << std::endl;
+        out << "  push rax" << std::endl;
+        break;
+    case NodeKind::NEQ:
+        generate(out, node->args.at(0));
+        generate(out, node->args.at(1));
+        out << "  pop rdi" << std::endl;
+        out << "  pop rax" << std::endl;
+        out << "  cmp rax, rdi" << std::endl;
+        out << "  setne al" << std::endl;
+        out << "  movzb rax, al" << std::endl;
+        out << "  push rax" << std::endl;
+        break;
+    case NodeKind::LT:
+        generate(out, node->args.at(0));
+        generate(out, node->args.at(1));
+        out << "  pop rdi" << std::endl;
+        out << "  pop rax" << std::endl;
+        out << "  cmp rax, rdi" << std::endl;
+        out << "  setl al" << std::endl;
+        out << "  movzb rax, al" << std::endl;
+        out << "  push rax" << std::endl;
+        break;
+    case NodeKind::LEQ:
+        generate(out, node->args.at(0));
+        generate(out, node->args.at(1));
+        out << "  pop rdi" << std::endl;
+        out << "  pop rax" << std::endl;
+        out << "  cmp rax, rdi" << std::endl;
+        out << "  setle al" << std::endl;
+        out << "  movzb rax, al" << std::endl;
+        out << "  push rax" << std::endl;
+        break;
     }
     return out;
 }

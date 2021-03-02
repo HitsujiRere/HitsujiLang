@@ -33,6 +33,5 @@
 
 
 .vscode
-tmp.*
 HitsujiLang
-/tmp
+tmp*

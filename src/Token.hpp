@@ -9,6 +9,7 @@ enum class TokenKind {
     RESERVED,   // 記号
     IDENT,      // 識別子
     NUMBER,     // 整数トークン
+    END,        // 終了
 };
 
 // トークン型
@@ -17,13 +18,15 @@ struct Token {
     int value;          // kindがTK_NUMの場合、その数値
     std::string txt;    // トークン文字列
     size_t pos;         // 位置
+
+    Token(TokenKind kind) : kind(kind) { }
 };
 
 // 記号
 const std::vector<std::string> reserves = {
-    "(", ")",
+    "==", "!=", "<=", ">=",
+    "<", ">", "(", ")",
     "+", "-", "*", "/", "%", 
-    // "==", "!=", "<=", ">=",
     // "**", "//", "&&", "||", "^^",
     // "(", ")", "{", "}", "<", ">",
     // ";", ",", "=", "+", "-", "*", "/", "%", "&" "|", "^",

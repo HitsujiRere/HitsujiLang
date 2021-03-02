@@ -5,11 +5,15 @@ bool isReserved(const std::vector<Token>::const_iterator& token_itr, const std::
     return token_itr->kind == TokenKind::RESERVED && token_itr->txt == txt;
 }
 
-// expr    = mul ("+" mul | "-" mul)*
-// mul     = unary ("*" unary | "/" unary)*
-// unary   = ("+" | "-")? primary
-// primary = num | "(" expr ")"
+// expr     = equality
+// comp     = add ("==" add | "!=" add | "<" add | "<=" add | ">" add | ">=" add)*
+// add      = mul ("+" mul | "-" mul)*
+// mul      = unary ("*" unary | "/" unary)*
+// unary    = ("+" | "-")? primary
+// primary  = num | "(" expr ")"
 Node *expr(std::vector<Token>::const_iterator& token_itr);
+Node *comp(std::vector<Token>::const_iterator& token_itr);
+Node *add(std::vector<Token>::const_iterator& token_itr);
 Node *mul(std::vector<Token>::const_iterator& token_itr);
 Node *unary(std::vector<Token>::const_iterator& token_itr);
 Node *primary(std::vector<Token>::const_iterator& token_itr);
@@ -21,6 +25,56 @@ Node *program(std::vector<Token>::const_iterator& token_itr) {
 }
 
 Node *expr(std::vector<Token>::const_iterator& token_itr) {
+    return comp(token_itr);
+}
+
+Node *comp(std::vector<Token>::const_iterator& token_itr) {
+    Node *node = add(token_itr);
+
+    while (true) {
+        if (isReserved(token_itr, "==")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::EQ);
+            expr_node->args.push_back(node);
+            expr_node->args.push_back(add(token_itr));
+            node = expr_node;
+        } else if (isReserved(token_itr, "!=")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::NEQ);
+            expr_node->args.push_back(node);
+            expr_node->args.push_back(add(token_itr));
+            node = expr_node;
+        } else if (isReserved(token_itr, "<")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::LT);
+            expr_node->args.push_back(node);
+            expr_node->args.push_back(add(token_itr));
+            node = expr_node;
+        } else if (isReserved(token_itr, ">")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::LT);
+            expr_node->args.push_back(add(token_itr));
+            expr_node->args.push_back(node);
+            node = expr_node;
+        } else if (isReserved(token_itr, "<=")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::LEQ);
+            expr_node->args.push_back(node);
+            expr_node->args.push_back(add(token_itr));
+            node = expr_node;
+        } else if (isReserved(token_itr, ">=")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::LEQ);
+            expr_node->args.push_back(add(token_itr));
+            expr_node->args.push_back(node);
+            node = expr_node;
+        } else {
+            return node;
+        }
+    }
+}
+
+Node *add(std::vector<Token>::const_iterator& token_itr) {
     Node *node = mul(token_itr);
 
     while (true) {
@@ -36,8 +90,7 @@ Node *expr(std::vector<Token>::const_iterator& token_itr) {
             expr_node->args.push_back(node);
             expr_node->args.push_back(mul(token_itr));
             node = expr_node;
-        }
-        else {
+        } else {
             return node;
         }
     }
@@ -65,8 +118,7 @@ Node *mul(std::vector<Token>::const_iterator& token_itr) {
             expr_node->args.push_back(node);
             expr_node->args.push_back(unary(token_itr));
             node = expr_node;
-        }
-        else {
+        } else {
             return node;
         }
     }

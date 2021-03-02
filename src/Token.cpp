@@ -57,8 +57,7 @@ std::vector<Token> tokenize(const std::string& code) {
 
         size_t len = search_reserves(code, i);
         if (len > 0) {
-            Token token;
-            token.kind = TokenKind::RESERVED;
+            Token token(TokenKind::RESERVED);
             token.txt = code.substr(i, len);
             token.pos = i;
             tokens.push_back(token);
@@ -76,8 +75,7 @@ std::vector<Token> tokenize(const std::string& code) {
 
         if ('0' <= code.at(i) && code.at(i) <= '9') {
             size_t len = get_number_len(code, i);
-            Token token;
-            token.kind = TokenKind::NUMBER;
+            Token token(TokenKind::NUMBER);
             token.value = parseToInt(code, i);
             token.pos = i;
             tokens.push_back(token);
@@ -87,6 +85,8 @@ std::vector<Token> tokenize(const std::string& code) {
 
         Error::at(i, "トークナイズできません");
     }
+
+    tokens.push_back(Token(TokenKind::END));
 
     // for (const auto& token : tokens) {
     //     std::cerr << (int)token.kind << " " << token.txt << " " << token.value << std::endl;

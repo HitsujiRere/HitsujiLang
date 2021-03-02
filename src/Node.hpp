@@ -14,6 +14,10 @@ enum class NodeKind {
     MUL,    // *
     DIV,    // /
     REM,    // %
+    EQ,     // ==
+    NEQ,    // !=
+    LT,     // <
+    LEQ,    // <=
     NUMBER, // 整数
     BLOCK,  // ブロック
 };

@@ -15,6 +15,6 @@ test: HitsujiLang
 		./test/test.sh
 
 clean:
-		rm -f HitsujiLang src/*.o test/tmp*
+		rm -f HitsujiLang src/*.o tmp*
 
 .PHONY: test clean
