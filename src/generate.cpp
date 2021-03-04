@@ -13,7 +13,13 @@ std::ostream &generate_lvalue(std::ostream &out, Node* node) {
     return out;
 }
 
+int LAndNumber = 0;
+int LOrNumber = 0;
+
 std::ostream &generate(std::ostream &out, Node* node) {
+    int LAndNumberNow = LAndNumber;
+    int LOrNumberNow = LOrNumber;
+
     switch(node->kind) {
     case NodeKind::NOP:
         break;
@@ -129,6 +135,38 @@ std::ostream &generate(std::ostream &out, Node* node) {
         out << "  cmp rax, rdi\n";
         out << "  setle al\n";
         out << "  movzb rax, al\n";
+        out << "  push rax\n";
+        break;
+    case NodeKind::AND:
+        LAndNumber++;
+        for (auto arg : node->args) {
+            generate(out, arg);
+            out << "  pop rax\n";
+            out << "  cmp rax, 0\n";
+            out << "  je .LAndFalse" << LAndNumberNow << "\n";
+        }
+        out << "  mov rax, 1\n";
+        out << "  jmp .LAndEnd" << LAndNumberNow << "\n";
+        out << ".LAndFalse" << LAndNumberNow << ":\n";
+        out << "  mov rax, 0\n";
+        out << ".LAndEnd" << LAndNumberNow << ":\n";
+        out << "  movzx rax, al\n";
+        out << "  push rax\n";
+        break;
+    case NodeKind::OR:
+        LOrNumber++;
+        for (auto arg : node->args) {
+            generate(out, arg);
+            out << "  pop rax\n";
+            out << "  cmp rax, 0\n";
+            out << "  jne .LOrTrue" << LOrNumberNow << "\n";
+        }
+        out << "  mov rax, 0\n";
+        out << "  jmp .LOrEnd" << LOrNumberNow << "\n";
+        out << ".LOrTrue" << LOrNumberNow << ":\n";
+        out << "  mov rax, 1\n";
+        out << ".LOrEnd" << LOrNumberNow << ":\n";
+        out << "  movzx rax, al\n";
         out << "  push rax\n";
         break;
     }

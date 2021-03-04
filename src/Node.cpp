@@ -62,7 +62,7 @@ Node *expr(std::vector<Token>::const_iterator& token_itr) {
 }
 
 Node *assign(std::vector<Token>::const_iterator& token_itr) {
-    Node *node = comp(token_itr);
+    Node *node = logical(token_itr);
 
     if (is_reserved(token_itr, "=")) {
         token_itr++;
@@ -75,8 +75,32 @@ Node *assign(std::vector<Token>::const_iterator& token_itr) {
     return node;
 }
 
+Node *logical(std::vector<Token>::const_iterator& token_itr) {
+    Node *node = comp(token_itr);
+    Node *head;
+
+    while (true) {
+        if (is_reserved(token_itr, "&&")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::AND);
+            expr_node->args.push_back(node);
+            expr_node->args.push_back(comp(token_itr));
+            node = expr_node;
+        } else if (is_reserved(token_itr, "||")) {
+            token_itr++;
+            Node *expr_node = new Node(NodeKind::OR);
+            expr_node->args.push_back(node);
+            expr_node->args.push_back(comp(token_itr));
+            node = expr_node;
+        } else {
+            return node;
+        }
+    }
+}
+
 Node *comp(std::vector<Token>::const_iterator& token_itr) {
     Node *node = add(token_itr);
+    Node *left = node;
 
     while (true) {
         if (is_reserved(token_itr, "==")) {

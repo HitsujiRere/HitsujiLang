@@ -20,6 +20,8 @@ enum class NodeKind {
     NEQ,    // !=
     LT,     // <
     LEQ,    // <=
+    AND,    // &&
+    OR,     // ||
     ASSIGN, // =
     RETURN, // return
     NUMBER, // 整数
@@ -41,7 +43,8 @@ struct Node {
 // stmt       = expr ";"
 //            | "return" expr ";"
 // expr       = assign
-// assign     = comp ("=" assign)?
+// assign     = logical ("=" assign)?
+// logical    = comp ("&&" comp | "||" comp);
 // comp       = add ("==" add | "!=" add | "<" add | "<=" add | ">" add | ">=" add)*
 // add        = mul ("+" mul | "-" mul)*
 // mul        = unary ("*" unary | "/" unary)*
@@ -51,6 +54,7 @@ Node *program(std::vector<Token>::const_iterator& token_itr);
 Node *stmt(std::vector<Token>::const_iterator& token_itr);
 Node *expr(std::vector<Token>::const_iterator& token_itr);
 Node *assign(std::vector<Token>::const_iterator& token_itr);
+Node *logical(std::vector<Token>::const_iterator& token_itr);
 Node *comp(std::vector<Token>::const_iterator& token_itr);
 Node *add(std::vector<Token>::const_iterator& token_itr);
 Node *mul(std::vector<Token>::const_iterator& token_itr);
