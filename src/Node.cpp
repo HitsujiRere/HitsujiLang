@@ -99,48 +99,54 @@ Node *logical(std::vector<Token>::const_iterator& token_itr) {
 }
 
 Node *comp(std::vector<Token>::const_iterator& token_itr) {
-    Node *node = add(token_itr);
-    Node *left = node;
+    Node *and_node = new Node(NodeKind::AND);
+    Node *left_node = add(token_itr);
 
     while (true) {
         if (is_reserved(token_itr, "==")) {
             token_itr++;
             Node *expr_node = new Node(NodeKind::EQ);
-            expr_node->args.push_back(node);
-            expr_node->args.push_back(add(token_itr));
-            node = expr_node;
+            Node *right_node = add(token_itr);
+            expr_node->args = {left_node, right_node};
+            and_node->args.push_back(expr_node);
+            left_node = right_node;
         } else if (is_reserved(token_itr, "!=")) {
             token_itr++;
             Node *expr_node = new Node(NodeKind::NEQ);
-            expr_node->args.push_back(node);
-            expr_node->args.push_back(add(token_itr));
-            node = expr_node;
+            Node *right_node = add(token_itr);
+            expr_node->args = {left_node, right_node};
+            and_node->args.push_back(expr_node);
+            left_node = right_node;
         } else if (is_reserved(token_itr, "<")) {
             token_itr++;
             Node *expr_node = new Node(NodeKind::LT);
-            expr_node->args.push_back(node);
-            expr_node->args.push_back(add(token_itr));
-            node = expr_node;
+            Node *right_node = add(token_itr);
+            expr_node->args = {left_node, right_node};
+            and_node->args.push_back(expr_node);
+            left_node = right_node;
         } else if (is_reserved(token_itr, ">")) {
             token_itr++;
             Node *expr_node = new Node(NodeKind::LT);
-            expr_node->args.push_back(add(token_itr));
-            expr_node->args.push_back(node);
-            node = expr_node;
+            Node *right_node = add(token_itr);
+            expr_node->args = {right_node, left_node};
+            and_node->args.push_back(expr_node);
+            left_node = right_node;
         } else if (is_reserved(token_itr, "<=")) {
             token_itr++;
             Node *expr_node = new Node(NodeKind::LEQ);
-            expr_node->args.push_back(node);
-            expr_node->args.push_back(add(token_itr));
-            node = expr_node;
+            Node *right_node = add(token_itr);
+            expr_node->args = {left_node, right_node};
+            and_node->args.push_back(expr_node);
+            left_node = right_node;
         } else if (is_reserved(token_itr, ">=")) {
             token_itr++;
             Node *expr_node = new Node(NodeKind::LEQ);
-            expr_node->args.push_back(add(token_itr));
-            expr_node->args.push_back(node);
-            node = expr_node;
+            Node *right_node = add(token_itr);
+            expr_node->args = {right_node, left_node};
+            and_node->args.push_back(expr_node);
+            left_node = right_node;
         } else {
-            return node;
+            return and_node->args.empty() ? left_node : and_node;
         }
     }
 }

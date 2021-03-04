@@ -8,7 +8,6 @@
 #include "Token.hpp"
 #include "Node.hpp"
 #include "generate.hpp"
-#include "LVar.hpp"
 
 // コード
 std::string code;
