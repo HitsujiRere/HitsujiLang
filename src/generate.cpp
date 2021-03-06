@@ -16,11 +16,13 @@ std::ostream &generate_lvalue(std::ostream &out, Node* node) {
 int LAndNumber = 0;
 int LOrNumber = 0;
 int LIfNumber = 0;
+int LWhileNumber = 0;
 
 std::ostream &generate(std::ostream &out, Node* node) {
     int LAndNumberNow = LAndNumber;
     int LOrNumberNow = LOrNumber;
     int LIfNumberNow = LIfNumber;
+    int LWhileNumberNow = LWhileNumber;
 
     switch(node->kind) {
     case NodeKind::NOP:
@@ -74,6 +76,25 @@ std::ostream &generate(std::ostream &out, Node* node) {
             generate(out, node->args.at(2));
             out << ".LIfEnd" << LIfNumberNow << ":\n";
         }
+        break;
+    case NodeKind::WHILE:
+        LWhileNumber++;
+        out << ".LWhileBegin" << LWhileNumberNow << ":\n";
+        generate(out, node->args.at(0));
+        out << "  pop rax\n";
+        out << "  cmp rax, 0\n";
+        if (node->args.size() == 2) {
+            out << "  je .LWhileEnd" << LWhileNumberNow << "\n";
+        } else {
+            out << "  je .LWhileElse" << LWhileNumberNow << "\n";
+        }
+        generate(out, node->args.at(1));
+        out << "  jmp .LWhileBegin" << LWhileNumberNow << "\n";
+        if (node->args.size() == 3) {
+            out << ".LWhileElse" << LWhileNumberNow << ":\n";
+            generate(out, node->args.at(2));
+        }
+        out << ".LWhileEnd" << LWhileNumberNow << ":\n";
         break;
     case NodeKind::ADD:
         generate(out, node->args.at(0));

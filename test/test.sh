@@ -81,5 +81,7 @@ assert 5 "a = 4; if 1 { a = 5; } a;"
 assert 4 "a = 4; if 0 { a = 5; } a;"
 assert 5 "if 7==7 { return 5; } else { return 3; }"
 assert 3 "if 3==7 { return 5; } else { return 3; }"
+assert 9 "a=4;while a < 9 {a = a + 1;} a;"
+assert 3 "a=4;while a < 9 {a = a + 1;} else {a = 3;} a;"
 
 echo OK

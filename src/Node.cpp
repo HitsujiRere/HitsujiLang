@@ -12,7 +12,7 @@ bool is_reserved(const std::vector<Token>::const_iterator& token_itr, const std:
 }
 
 bool is_control_syntax(const std::vector<Token>::const_iterator& token_itr) {
-    for (const auto& control_txt : { "{", "if", }) {
+    for (const auto& control_txt : { "{", "if", "while", }) {
         if (control_txt == token_itr->txt) {
             return true;
         }
@@ -43,10 +43,7 @@ Node *program(std::vector<Token>::const_iterator& token_itr) {
 }
 
 Node *stmt(std::vector<Token>::const_iterator& token_itr) {
-    if (is_reserved(token_itr, ";")) {
-        token_itr++;
-        return new Node(NodeKind::NOP);
-    } else if (is_reserved(token_itr, "return")) {
+    if (is_reserved(token_itr, "return")) {
         token_itr++;
 
         Node *node = new Node(NodeKind::RETURN);
@@ -97,6 +94,20 @@ Node *control(std::vector<Token>::const_iterator& token_itr) {
         }
 
         return if_node;
+    } else if (is_reserved(token_itr, "while")) {
+        token_itr++;
+
+        Node *while_node = new Node(NodeKind::WHILE);
+        while_node->args.push_back(expr(token_itr));
+        while_node->args.push_back(stmt(token_itr));
+
+        if (is_reserved(token_itr, "else")) {
+            token_itr++;
+
+            while_node->args.push_back(stmt(token_itr));
+        }
+
+        return while_node;
     } else {
         Error::at(token_itr->pos, "制御構文ではありません");
         return nullptr;

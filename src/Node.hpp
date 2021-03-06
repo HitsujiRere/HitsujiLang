@@ -25,6 +25,7 @@ enum class NodeKind {
     ASSIGN, // =
     RETURN, // return
     IF,     // if
+    WHILE,  // while
     NUMBER, // 整数
     LVAR,   // ローカル変数
     BLOCK,  // ブロック
@@ -46,6 +47,7 @@ struct Node {
 //            | "return" expr ";"
 // control    = "{" stmt* "}"
 //            | "if" expr stmt ("else" stmt)?
+//            | "while" expr stmt ("else" stmt)?
 // expr       = assign
 // assign     = logical ("=" assign)?
 // logical    = comp ("&&" comp | "||" comp);
