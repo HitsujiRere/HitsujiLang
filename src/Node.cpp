@@ -11,10 +11,20 @@ bool is_reserved(const std::vector<Token>::const_iterator& token_itr, const std:
     return token_itr->kind == TokenKind::RESERVED && token_itr->txt == txt;
 }
 
+bool is_control_syntax(const std::vector<Token>::const_iterator& token_itr) {
+    for (const auto& control_txt : { "{", "if", }) {
+        if (control_txt == token_itr->txt) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int get_offset(const std::vector<Token>::const_iterator& token_itr, const std::string& name) {
     auto lvar_itr = lvars.find(name);
 
     if (lvar_itr == lvars.end()) {
+        // Error::at(token_itr->pos, "不明な変数です");
         LVar lvar(name, next_offset);
         next_offset += 8;
         lvars.emplace(name, lvar);
@@ -33,7 +43,10 @@ Node *program(std::vector<Token>::const_iterator& token_itr) {
 }
 
 Node *stmt(std::vector<Token>::const_iterator& token_itr) {
-    if (is_reserved(token_itr, "return")) {
+    if (is_reserved(token_itr, ";")) {
+        token_itr++;
+        return new Node(NodeKind::NOP);
+    } else if (is_reserved(token_itr, "return")) {
         token_itr++;
 
         Node *node = new Node(NodeKind::RETURN);
@@ -45,6 +58,8 @@ Node *stmt(std::vector<Token>::const_iterator& token_itr) {
         token_itr++;
 
         return node;
+    } else if (is_control_syntax(token_itr)) {
+        return control(token_itr);
     } else {
         Node *node = expr(token_itr);
 
@@ -54,6 +69,37 @@ Node *stmt(std::vector<Token>::const_iterator& token_itr) {
         token_itr++;
 
         return node;
+    }
+}
+
+Node *control(std::vector<Token>::const_iterator& token_itr) {
+    if (is_reserved(token_itr, "{")) {
+        token_itr++;
+
+        Node *block_node = new Node(NodeKind::BLOCK);
+        while (!is_reserved(token_itr, "}")) {
+            block_node->args.push_back(stmt(token_itr));
+        }
+        token_itr++;
+
+        return block_node;
+    } else if (is_reserved(token_itr, "if")) {
+        token_itr++;
+
+        Node *if_node = new Node(NodeKind::IF);
+        if_node->args.push_back(expr(token_itr));
+        if_node->args.push_back(stmt(token_itr));
+
+        if (is_reserved(token_itr, "else")) {
+            token_itr++;
+
+            if_node->args.push_back(stmt(token_itr));
+        }
+
+        return if_node;
+    } else {
+        Error::at(token_itr->pos, "制御構文ではありません");
+        return nullptr;
     }
 }
 

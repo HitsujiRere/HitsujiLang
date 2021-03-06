@@ -26,13 +26,13 @@ struct Token {
 const std::vector<std::string> reserves = {
     "==", "!=", "<=", ">=",
     "&&", "||",
-    "<", ">", "(", ")",
+    "<", ">", "(", ")", "{", "}",
     "+", "-", "*", "/", "%", "=", ";",
 };
 
 // 識別子のような記号
 const std::vector<std::string> reserves_ident = {
-    "return",
+    "return", "if", "else",
 };
 
 // トークナイズをする

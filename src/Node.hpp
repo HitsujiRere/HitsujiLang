@@ -24,6 +24,7 @@ enum class NodeKind {
     OR,     // ||
     ASSIGN, // =
     RETURN, // return
+    IF,     // if
     NUMBER, // 整数
     LVAR,   // ローカル変数
     BLOCK,  // ブロック
@@ -41,7 +42,10 @@ struct Node {
 
 // program    = stmt*
 // stmt       = expr ";"
+//            | control
 //            | "return" expr ";"
+// control    = "{" stmt* "}"
+//            | "if" expr stmt ("else" stmt)?
 // expr       = assign
 // assign     = logical ("=" assign)?
 // logical    = comp ("&&" comp | "||" comp);
@@ -52,6 +56,7 @@ struct Node {
 // primary    = "(" expr ")" | num | ident
 Node *program(std::vector<Token>::const_iterator& token_itr);
 Node *stmt(std::vector<Token>::const_iterator& token_itr);
+Node *control(std::vector<Token>::const_iterator& token_itr);
 Node *expr(std::vector<Token>::const_iterator& token_itr);
 Node *assign(std::vector<Token>::const_iterator& token_itr);
 Node *logical(std::vector<Token>::const_iterator& token_itr);

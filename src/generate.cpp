@@ -15,10 +15,12 @@ std::ostream &generate_lvalue(std::ostream &out, Node* node) {
 
 int LAndNumber = 0;
 int LOrNumber = 0;
+int LIfNumber = 0;
 
 std::ostream &generate(std::ostream &out, Node* node) {
     int LAndNumberNow = LAndNumber;
     int LOrNumberNow = LOrNumber;
+    int LIfNumberNow = LIfNumber;
 
     switch(node->kind) {
     case NodeKind::NOP:
@@ -54,6 +56,24 @@ std::ostream &generate(std::ostream &out, Node* node) {
         out << "  mov rsp, rbp\n";
         out << "  pop rbp\n";
         out << "  ret\n";
+        break;
+    case NodeKind::IF:
+        LIfNumber++;
+        generate(out, node->args.at(0));
+        out << "  pop rax\n";
+        out << "  cmp rax, 0\n";
+        if (node->args.size() == 2) {
+            out << "  je  .LIfEnd" << LIfNumberNow << "\n";
+            generate(out, node->args.at(1));
+            out << ".LIfEnd" << LIfNumberNow << ":\n";
+        } else {
+            out << "  je  .LIfElse" << LIfNumberNow << "\n";
+            generate(out, node->args.at(1));
+            out << "  jmp  .LIfEnd" << LIfNumberNow << "\n";
+            out << ".LIfElse" << LIfNumberNow << ":\n";
+            generate(out, node->args.at(2));
+            out << ".LIfEnd" << LIfNumberNow << ":\n";
+        }
         break;
     case NodeKind::ADD:
         generate(out, node->args.at(0));
