@@ -27,7 +27,7 @@ size_t search_reserves(const std::string& txt, size_t i) {
         }
     }
     for (const auto& reserve : reserves_ident) {
-        if (reserve == txt.substr(i, reserve.size()) && 
+        if (reserve == txt.substr(i, reserve.size()) &&
             !is_ident_char(txt.at(i + reserve.size()))) {
             return reserve.size();
         }

@@ -9,7 +9,7 @@ std::ostream &generate_lvalue(std::ostream &out, Node* node) {
     out << "  mov rax, rbp\n";
     out << "  sub rax, " << node->offset << "\n";
     out << "  push rax\n";
-    
+
     return out;
 }
 
@@ -17,12 +17,14 @@ int LAndNumber = 0;
 int LOrNumber = 0;
 int LIfNumber = 0;
 int LWhileNumber = 0;
+int LForNumber = 0;
 
 std::ostream &generate(std::ostream &out, Node* node) {
     int LAndNumberNow = LAndNumber;
     int LOrNumberNow = LOrNumber;
     int LIfNumberNow = LIfNumber;
     int LWhileNumberNow = LWhileNumber;
+    int LForNumberNow = LForNumber;
 
     switch(node->kind) {
     case NodeKind::NOP:
@@ -95,6 +97,27 @@ std::ostream &generate(std::ostream &out, Node* node) {
             generate(out, node->args.at(2));
         }
         out << ".LWhileEnd" << LWhileNumberNow << ":\n";
+        break;
+    case NodeKind::FOR:
+        LForNumber++;
+        generate(out, node->args.at(0));
+        out << ".LForBegin" << LForNumberNow << ":\n";
+        generate(out, node->args.at(1));
+        out << "  pop rax\n";
+        out << "  cmp rax, 0\n";
+        if (node->args.size() == 4) {
+            out << "  je .LForEnd" << LForNumberNow << "\n";
+        } else {
+            out << "  je .LForElse" << LForNumberNow << "\n";
+        }
+        generate(out, node->args.at(3));
+        generate(out, node->args.at(2));
+        out << "  jmp .LForBegin" << LForNumberNow << "\n";
+        if (node->args.size() == 5) {
+            out << ".LForElse" << LForNumberNow << ":\n";
+            generate(out, node->args.at(4));
+        }
+        out << ".LForEnd" << LForNumberNow << ":\n";
         break;
     case NodeKind::ADD:
         generate(out, node->args.at(0));

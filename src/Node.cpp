@@ -12,7 +12,7 @@ bool is_reserved(const std::vector<Token>::const_iterator& token_itr, const std:
 }
 
 bool is_control_syntax(const std::vector<Token>::const_iterator& token_itr) {
-    for (const auto& control_txt : { "{", "if", "while", }) {
+    for (const auto& control_txt : { "{", "if", "while", "for", }) {
         if (control_txt == token_itr->txt) {
             return true;
         }
@@ -108,6 +108,43 @@ Node *control(std::vector<Token>::const_iterator& token_itr) {
         }
 
         return while_node;
+    } else if (is_reserved(token_itr, "for")) {
+        token_itr++;
+
+        Node *for_node = new Node(NodeKind::FOR);
+
+        if (!is_reserved(token_itr, "{")) {
+            Error::at(token_itr->pos, "'{'ではありません");
+        }
+        token_itr++;
+
+        for_node->args.push_back(expr(token_itr));
+        if (!is_reserved(token_itr, ";")) {
+            Error::at(token_itr->pos, "';'ではありません");
+        }
+        token_itr++;
+
+        for_node->args.push_back(expr(token_itr));
+        if (!is_reserved(token_itr, ";")) {
+            Error::at(token_itr->pos, "';'ではありません");
+        }
+        token_itr++;
+
+        for_node->args.push_back(expr(token_itr));
+        if (!is_reserved(token_itr, "}")) {
+            Error::at(token_itr->pos, "'}'ではありません");
+        }
+        token_itr++;
+
+        for_node->args.push_back(stmt(token_itr));
+
+        if (is_reserved(token_itr, "else")) {
+            token_itr++;
+
+            for_node->args.push_back(stmt(token_itr));
+        }
+
+        return for_node;
     } else {
         Error::at(token_itr->pos, "制御構文ではありません");
         return nullptr;
@@ -203,7 +240,12 @@ Node *comp(std::vector<Token>::const_iterator& token_itr) {
             and_node->args.push_back(expr_node);
             left_node = right_node;
         } else {
-            return and_node->args.empty() ? left_node : and_node;
+            if (and_node->args.empty())
+                return left_node;
+            else if (and_node->args.size() == 1)
+                return and_node->args.at(0);
+            else 
+                return and_node;
         }
     }
 }
