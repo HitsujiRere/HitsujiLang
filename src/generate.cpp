@@ -19,6 +19,10 @@ int LIfNumber = 0;
 int LWhileNumber = 0;
 int LForNumber = 0;
 
+std::vector<std::string> func_args = {
+    "edi", "esi", "edx", "ecx", "r8d", "r9d",
+};
+
 std::ostream &generate(std::ostream &out, Node* node) {
     int LAndNumberNow = LAndNumber;
     int LOrNumberNow = LOrNumber;
@@ -118,6 +122,17 @@ std::ostream &generate(std::ostream &out, Node* node) {
             generate(out, node->args.at(4));
         }
         out << ".LForEnd" << LForNumberNow << ":\n";
+        break;
+    case NodeKind::CALL:
+        for (size_t i = 0; i < node->args.size(); i++) {
+            auto arg = node->args.at(i);
+            generate(out, arg);
+            if (arg->kind != NodeKind::BLOCK)
+                std::cout << "  pop rax\n";
+            std::cout << "  mov " << func_args.at(i) <<", eax\n";
+        }
+        out << "  call " << node->txt << "\n";
+        out << "  push rax\n";
         break;
     case NodeKind::ADD:
         generate(out, node->args.at(0));

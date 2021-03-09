@@ -332,10 +332,32 @@ Node *primary(std::vector<Token>::const_iterator& token_itr) {
         token_itr++;
         return node;
     } else if (token_itr->kind == TokenKind::IDENT) {
-        Node *node = new Node(NodeKind::LVAR);
-        node->offset = get_offset(token_itr, token_itr->txt);
-        token_itr++;
-        return node;
+        if (is_reserved(token_itr + 1, "(")) {
+            Node *node = new Node(NodeKind::CALL);
+            node->txt = token_itr->txt;
+            token_itr += 2;
+
+            if (!is_reserved(token_itr, ")")) {
+                node->args.push_back(expr(token_itr));
+
+                while(!is_reserved(token_itr, ")")) {
+                    if (!is_reserved(token_itr, ",")) {
+                        Error::at(token_itr->pos, "','ではありません");
+                    }
+                    token_itr++;
+
+                    node->args.push_back(expr(token_itr));
+                }
+            }
+            token_itr++;
+
+            return node;
+        } else {
+            Node *node = new Node(NodeKind::LVAR);
+            node->offset = get_offset(token_itr, token_itr->txt);
+            token_itr++;
+            return node;
+        }
     } else {
         Error::at(token_itr->pos, "'('または数字，識別子ではありません");
         return nullptr;

@@ -1,10 +1,13 @@
 #!/bin/bash
+
+cc -c test/lib-c.c -o tmp-lib-c.o
+
 assert() {
   expected="$1"
   input="$2"
 
   ./HitsujiLang "$input" > tmp.s
-  cc -o tmp tmp.s
+  cc -o tmp tmp.s tmp-lib-c.o
   ./tmp
   actual="$?"
 
@@ -85,5 +88,7 @@ assert 9 "a=4;while a < 9 {a = a + 1;} a;"
 assert 3 "a=4;while a < 9 {a = a + 1;} else {a = 3;} a;"
 assert 10 "a=3;b=0;for {a = 1; a <= 4; a = a+1} {b = b + a;} b;"
 assert 20 "a=3;b=0;for {a = 1; a <= 4; a = a+1} {b = b + a;} else {b = b + 10;} b;"
+assert 17 "ret17();"
+assert 14 "add(5, 9);"
 
 echo OK

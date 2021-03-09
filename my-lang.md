@@ -1,6 +1,68 @@
 # My Lang
 
-自作言語の話です
+## できる
+
+- 比較演算子の連鎖
+
+```
+if a < b <= c {
+    ...
+}
+```
+
+## できない
+
+- 型の実装
+
+```
+let a:int;
+```
+
+- breakやcontinueの実装
+
+```
+# Endまで飛ぶ
+{
+    break;
+}
+
+# Beginに戻る
+{
+    continue;
+}
+```
+
+- ブロックやifなどから値を返す
+
+```
+a = {
+    break 1;
+}
+
+return if a == b { break 1; } else { break 3; }
+```
+
+- forをrangeにする
+
+```
+# n = {1, 2, 3, 4}}
+for n to 5 {
+    ...
+}
+
+# n = {3, 5, 7, 9}
+for n from 3 to 10 step 2 {
+    ...
+}
+```
+
+- 関数呼び出しを()を使わずに
+
+```
+func arg1 arg2 arg3;
+```
+
+## メモ
 
 ```
 def main {

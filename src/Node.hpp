@@ -27,6 +27,7 @@ enum class NodeKind {
     IF,     // if
     WHILE,  // while
     FOR,    // for
+    CALL,   // 関数呼び出し
     NUMBER, // 整数
     LVAR,   // ローカル変数
     BLOCK,  // ブロック
@@ -38,6 +39,7 @@ struct Node {
     int value;                  // kindがNUMBERのとき，値
     std::vector<Node *> args;   // 子
     int offset;                 // kindがLVARのとき，オフセット
+    std::string txt;            // 名前
 
     Node(NodeKind kind) : kind(kind) { }
 };
@@ -57,7 +59,9 @@ struct Node {
 // add        = mul ("+" mul | "-" mul)*
 // mul        = unary ("*" unary | "/" unary)*
 // unary      = ("+" | "-")? primary
-// primary    = "(" expr ")" | num | ident
+// primary    = "(" expr ")"
+//            | num
+//            | ident ()?
 Node *program(std::vector<Token>::const_iterator& token_itr);
 Node *stmt(std::vector<Token>::const_iterator& token_itr);
 Node *control(std::vector<Token>::const_iterator& token_itr);
